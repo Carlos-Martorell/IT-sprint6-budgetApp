@@ -1,5 +1,7 @@
 <form [formGroup]="mainForm">
 
+  <h2 class="text-2xl font-bold mb-4">Selecciona los servicios:</h2>
+
   <div>
     <input type="checkbox" id="seo" formControlName="seo">
     <label for="seo">Hacer una campaña SEO (300 €)</label>
@@ -15,9 +17,54 @@
     <label for="web">Hacer una página web (500 €)</label>
   </div>
 
+  <hr class="my-6">
+
+  <div *ngIf="mainForm.controls.web.value" [formGroup]="panelForm" class="panel-ajuste">
+
+      <h3 class="text-xl font-semibold mb-4">Ajuste de la Página Web:</h3>
+
+      <div class="flex items-center space-x-4 mb-4">
+          <label for="numPages">Número de páginas:</label>
+
+          <button type="button"
+                  (click)="updatePanelValue('numPages', -1)"
+                  [disabled]="(panelForm.get('numPages')!.value ?? 0) <= 1"
+                  class="btn-control">
+              –
+          </button>
+
+          <input type="number" formControlName="numPages" readonly class="input-display">
+
+          <button type="button"
+                  (click)="updatePanelValue('numPages', 1)"
+                  class="btn-control">
+              +
+          </button>
+      </div>
+
+      <div class="flex items-center space-x-4">
+          <label for="numLanguages">Número de idiomas:</label>
+
+          <button type="button"
+                  (click)="updatePanelValue('numLanguages', -1)"
+                  [disabled]="(panelForm.get('numLanguages')!.value ?? 0) <= 1"
+                  class="btn-control">
+              –
+          </button>
+
+          <input type="number" formControlName="numLanguages" readonly class="input-display">
+
+          <button type="button"
+                  (click)="updatePanelValue('numLanguages', 1)"
+                  class="btn-control">
+              +
+          </button>
+      </div>
+  </div>
+
 </form>
 
-<div>
-  PRECIO TOTAL:
-  <span>{{ budgetService.totalPrice() | number:'1.2-2' }} €</span>
+<div class="mt-8 p-4 bg-gray-100 font-bold text-lg">
+PRECIO TOTAL:
+<span>{{ budgetService.totalPrice() | number:'1.2-2' }} €</span>
 </div>
