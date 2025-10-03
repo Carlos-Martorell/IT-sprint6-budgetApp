@@ -1,0 +1,23 @@
+<form [formGroup]="mainForm">
+
+  <div>
+    <input type="checkbox" id="seo" formControlName="seo">
+    <label for="seo">Hacer una campaña SEO (300 €)</label>
+  </div>
+
+  <div>
+    <input type="checkbox" id="ads" formControlName="ads">
+    <label for="ads">Hacer una campaña de publicidad (400 €)</label>
+  </div>
+
+  <div>
+    <input type="checkbox" id="web" formControlName="web">
+    <label for="web">Hacer una página web (500 €)</label>
+  </div>
+
+</form>
+
+<div>
+  PRECIO TOTAL:
+  <span>{{ budgetService.totalPrice() | number:'1.2-2' }} €</span>
+</div>
