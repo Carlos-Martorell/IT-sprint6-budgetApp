@@ -1,2 +1,15 @@
 
 @import "tailwindcss";
+/* Ocultar las flechas de subir y bajar en inputs de tipo number */
+
+/* Para navegadores basados en WebKit (Chrome, Safari) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Para Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}

@@ -19,7 +19,8 @@
 
   <hr class="my-6">
 
-  <div *ngIf="mainForm.controls.web.value" [formGroup]="panelForm" class="panel-ajuste">
+  @if (mainForm.controls.web.value) {
+    <div [formGroup]="panelForm" class="panel-ajuste">
 
       <h3 class="text-xl font-semibold mb-4">Ajuste de la Página Web:</h3>
 
@@ -29,15 +30,15 @@
           <button type="button"
                   (click)="updatePanelValue('numPages', -1)"
                   [disabled]="(panelForm.get('numPages')!.value ?? 0) <= 1"
-                  class="btn-control">
+                  class="w-8 h-8 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 disabled:opacity-50 transition">
               –
           </button>
 
-          <input type="number" formControlName="numPages" readonly class="input-display">
+          <input type="number" formControlName="numPages" readonly class="w-16 text-center border border-gray-300 rounded-md p-1 font-semibold">
 
           <button type="button"
                   (click)="updatePanelValue('numPages', 1)"
-                  class="btn-control">
+                  class="w-8 h-8 rounded-full bg-indigo-500 text-white hover:bg-indigo-600">
               +
           </button>
       </div>
@@ -48,21 +49,24 @@
           <button type="button"
                   (click)="updatePanelValue('numLanguages', -1)"
                   [disabled]="(panelForm.get('numLanguages')!.value ?? 0) <= 1"
-                  class="btn-control">
+                  class="w-8 h-8 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 disabled:opacity-50 transition">
               –
           </button>
 
-          <input type="number" formControlName="numLanguages" readonly class="input-display">
+          <input type="number" formControlName="numLanguages" readonly class="w-16 text-center border border-gray-300 rounded-md p-1 font-semibold">
 
           <button type="button"
                   (click)="updatePanelValue('numLanguages', 1)"
-                  class="btn-control">
+                  class="w-8 h-8 rounded-full bg-indigo-500 text-white hover:bg-indigo-600">
               +
           </button>
       </div>
   </div>
-
+  }
 </form>
+
+
+
 
 <div class="mt-8 p-4 bg-gray-100 font-bold text-lg">
 PRECIO TOTAL:
