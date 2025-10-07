@@ -25,7 +25,11 @@
       <h3 class="text-xl font-semibold mb-4">Ajuste de la Página Web:</h3>
 
       <div class="flex items-center space-x-4 mb-4">
-          <label for="numPages">Número de páginas:</label>
+        <button (click)="openHelpModal('pages')" type="button"
+            class="ml-3 w-6 h-6 rounded-full border-2 border-indigo-500 text-indigo-500 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center text-sm font-bold">
+        i
+    </button>
+        <label for="numPages">Número de páginas:</label>
 
           <button type="button"
                   (click)="updatePanelValue('numPages', -1)"
@@ -44,7 +48,11 @@
       </div>
 
       <div class="flex items-center space-x-4">
-          <label for="numLanguages">Número de idiomas:</label>
+        <button (click)="openHelpModal('languages')" type="button"
+            class="ml-3 w-6 h-6 rounded-full border-2 border-indigo-500 text-indigo-500 hover:bg-indigo-500 hover:text-white transition flex items-center justify-center text-sm font-bold">
+        i
+    </button>
+        <label for="numLanguages">Número de idiomas:</label>
 
           <button type="button"
                   (click)="updatePanelValue('numLanguages', -1)"
@@ -65,8 +73,41 @@
   }
 </form>
 
+@if (activeHelpModal() !== 'closed') {
+  <div class="fixed inset-0 bg-blur bg-opacity-70 flex items-center justify-center z-50"
+       (click)="closeHelpModal()">
+
+    <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full mx-4"
+         (click)="$event.stopPropagation()">
+
+      <h4 class="text-2xl font-bold mb-4 text-center text-gray-800">
+        @if (activeHelpModal() === 'pages') {
+          Número de Páginas
+        } @else {
+          Número de Idiomas
+        }
+      </h4>
+
+      @if (activeHelpModal() === 'pages') {
+        <p class="mb-6 text-center text-gray-700">
+            Añade las páginas que tendrá tu web, teniendo en cuenta que el precio base ya incluye una. El coste de cada página adicional es de {{ budgetService.PRICE_PER_MODULE }}€.
+        </p>
+      } @else {
+        <p class="mb-6 text-center text-gray-700">
+            Añade los idiomas a los que se traducirá tu proyecto, teniendo en cuenta que el precio base ya incluye un idioma principal. El coste de cada idioma adicional es de {{ budgetService.PRICE_PER_MODULE }}€.
+        </p>
+      }
 
 
+      <div class="text-center">
+        <button (click)="closeHelpModal()"
+                class="px-6 py-2 bg-indigo-500 text-white font-medium rounded-lg hover:bg-indigo-700 transition">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+}
 
 <div class="mt-8 p-4 bg-gray-100 font-bold text-lg">
 PRECIO TOTAL:

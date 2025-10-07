@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BudgetService } from '../../core/services/budget';
 import { CommonModule } from '@angular/common';
@@ -20,6 +20,22 @@ export class HomeComponent {
     numPages: new FormControl(1, [Validators.required, Validators.min(1)]),
     numLanguages: new FormControl(1, [Validators.required, Validators.min(1)]),
   });
+
+
+// Signal para controlar QUÉ modal está abierto ('closed', 'pages', 'languages')
+// Usamos 'closed' como valor inicial.
+public activeHelpModal = signal<'closed' | 'pages' | 'languages'>('closed');
+
+// Método para abrir el modal específico (llamado por los nuevos botones)
+public openHelpModal(type: 'pages' | 'languages'): void {
+  this.activeHelpModal.set(type);
+}
+
+// Método para cerrar el modal
+public closeHelpModal(): void {
+  this.activeHelpModal.set('closed');
+}
+
 
   public budgetService = inject(BudgetService);
   //panel
