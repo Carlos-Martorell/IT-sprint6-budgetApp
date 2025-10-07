@@ -17,12 +17,14 @@ PRICE_PER_MODULE = 30
 totalPrice = computed(() => {
   const baseCost = this.options().filter(option => option.selected)
     .reduce((total, option) => total + option.price, 0)
+    
     // Coste por cada PÁGINA ADICIONAL y cada IDIOMA ADICIONAL
    const pagesMultiplier = Math.max(0, this.numPages() - 1); // Si es 1, el resultado es 0
    const languagesMultiplier = Math.max(0, this.numLanguages() - 1); // Si es 1, el resultado es 0
    const costPages = pagesMultiplier * this.PRICE_PER_MODULE;
    const costLanguages = languagesMultiplier * this.PRICE_PER_MODULE;
    const panelExtra = costPages + costLanguages;
+
    const webSelected = this.options().find(opt => opt.id === 3)?.selected;
    const extraCost = webSelected ? panelExtra : 0;
    return baseCost + extraCost;
