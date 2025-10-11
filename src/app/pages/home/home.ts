@@ -104,8 +104,9 @@ public closeHelpModal(): void {
         this.clientForm.get('clientEmail')!.value
       );
 
-      // Opcional: resetear el formulario del cliente después de guardar
       this.clientForm.reset();
+      this.mainForm.reset({ seo: false, ads: false, web: false });
+      this.panelForm.reset({ numPages: 1, numLanguages: 1 });
       alert('Presupuesto guardado con éxito!');
 
     } else {
