@@ -1,12 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BudgetService } from '../../core/services/budget';
 import { CommonModule } from '@angular/common';
+import { BudgetsListComponent } from '../../shared/components/budgets-list/budgets-list';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule ,ReactiveFormsModule],
+  imports: [CommonModule ,ReactiveFormsModule, BudgetsListComponent],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
@@ -56,6 +57,9 @@ public closeHelpModal(): void {
     }
   }
 
+  //formulario
+  fb = inject(FormBuilder);
+  clientForm: FormGroup;
 
   constructor() {
 
@@ -82,6 +86,31 @@ public closeHelpModal(): void {
           );
         }
       });
+
+      this.clientForm = this.fb.group({
+        clientName: ['', Validators.required],
+        clientPhone: ['', Validators.required],
+        clientEmail: ['', [Validators.required, Validators.email]]
+      });
+
+
+  }
+
+  saveBudget(): void {
+    if (this.clientForm.valid) {
+      this.budgetService.saveBudget(
+        this.clientForm.get('clientName')!.value,
+        this.clientForm.get('clientPhone')!.value,
+        this.clientForm.get('clientEmail')!.value
+      );
+
+      // Opcional: resetear el formulario del cliente después de guardar
+      this.clientForm.reset();
+      alert('Presupuesto guardado con éxito!');
+
+    } else {
+      alert('Por favor, rellena todos los campos del cliente.');
+    }
   }
 
 }
