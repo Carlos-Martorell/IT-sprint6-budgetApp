@@ -17,3 +17,5 @@ export interface Budget {
   totalPrice: number;
   creationDate: Date;
 }
+
+export type SortKey = 'date' | 'price' | 'name';

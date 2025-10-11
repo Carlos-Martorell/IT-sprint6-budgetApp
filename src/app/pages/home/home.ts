@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BudgetService } from '../../core/services/budget';
+import { BudgetService } from '@core/services/budget';
 import { CommonModule } from '@angular/common';
-import { BudgetsListComponent } from '../../shared/components/budgets-list/budgets-list';
+import { BudgetsListComponent } from '@shared/components/budgets-list/budgets-list';
 
 @Component({
   selector: 'app-home',
