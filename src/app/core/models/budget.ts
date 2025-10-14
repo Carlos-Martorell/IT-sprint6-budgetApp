@@ -19,3 +19,18 @@ export interface Budget {
 }
 
 export type SortKey = 'date' | 'price' | 'name';
+
+// Interfaces para los valores emitidos por los FormGroups
+
+// I. Para mainForm
+export interface MainFormValues {
+  seo?: boolean | null | undefined;
+  ads?: boolean | null | undefined;
+  web?: boolean | null | undefined;
+}
+
+// II. Para panelForm
+export interface PanelFormValues {
+  numPages?: number | null; // El valor puede ser null si se resetea
+  numLanguages?: number | null;
+}

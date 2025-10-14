@@ -1,8 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BudgetService } from '@core/services/budget';
 import { CommonModule } from '@angular/common';
 import { BudgetsListComponent } from '@shared/components/budgets-list/budgets-list';
+import { ActivatedRoute, Router, Params } from '@angular/router';
+import { MainFormValues, PanelFormValues } from '@core/models/budget';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +13,7 @@ import { BudgetsListComponent } from '@shared/components/budgets-list/budgets-li
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   public mainForm = new FormGroup({
     seo: new FormControl(false),
     ads: new FormControl(false),
@@ -22,24 +24,21 @@ export class HomeComponent {
     numLanguages: new FormControl(1, [Validators.required, Validators.min(1)]),
   });
 
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-// Signal para controlar QUÉ modal está abierto ('closed', 'pages', 'languages')
-// Usamos 'closed' como valor inicial.
+
 public activeHelpModal = signal<'closed' | 'pages' | 'languages'>('closed');
 
-// Método para abrir el modal específico (llamado por los nuevos botones)
 public openHelpModal(type: 'pages' | 'languages'): void {
   this.activeHelpModal.set(type);
 }
-
-// Método para cerrar el modal
 public closeHelpModal(): void {
   this.activeHelpModal.set('closed');
 }
 
-
   public budgetService = inject(BudgetService);
-  //panel
+
   public updatePanelValue(controlName: 'numPages' | 'numLanguages', change: 1 | -1): void {
     const control = this.panelForm.get(controlName); // Obtiene el FormControl específico
 
@@ -57,35 +56,10 @@ public closeHelpModal(): void {
     }
   }
 
-  //formulario
   fb = inject(FormBuilder);
   clientForm: FormGroup;
 
   constructor() {
-
-      // Suscripción 1: SEO
-      this.mainForm.controls.seo.valueChanges.subscribe(selected => {
-        this.budgetService.updateOptionSelection(1, selected ?? false);
-      });
-
-      // Suscripción 2: Publicidad (ID 2)
-      this.mainForm.controls.ads.valueChanges.subscribe(selected => {
-        this.budgetService.updateOptionSelection(2, selected ?? false);
-      });
-
-      // Suscripción 3: Web (ID 3)
-      this.mainForm.controls.web.valueChanges.subscribe(selected => {
-        this.budgetService.updateOptionSelection(3, selected ?? false);
-      });
-      //panel
-      this.panelForm.valueChanges.subscribe(values => {
-        if (this.panelForm.valid) {
-          this.budgetService.updatePanelSettings(
-            values.numPages ?? 1,
-            values.numLanguages ?? 1
-          );
-        }
-      });
 
       this.clientForm = this.fb.group({
         clientName: ['', Validators.required],
@@ -95,7 +69,71 @@ public closeHelpModal(): void {
 
 
   }
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.loadFormFromUrl(params);
+    });
 
+    this.mainForm.valueChanges.subscribe(value => {
+      this.updateUrl(value, this.panelForm.value);
+    });
+
+    this.panelForm.valueChanges.subscribe(values => {
+      this.updateUrl(this.mainForm.value, values);
+    });
+  }
+
+loadFormFromUrl(params: Params): void {
+  const options = { emitEvent: false };
+
+  this.mainForm.patchValue({
+    seo: params['seo'] === 'true',
+    ads: params['ads'] === 'true',
+    web: params['web'] === 'true',
+  }, options);
+
+  const numPages = parseInt(params['pages'] || '1', 10);
+  const numLanguages = parseInt(params['langs'] || '1', 10);
+
+  this.panelForm.patchValue({
+    numPages: numPages,
+    numLanguages: numLanguages,
+  }, options);
+
+
+  this.budgetService.updateOptionSelection(1, params['seo'] === 'true');
+  this.budgetService.updateOptionSelection(2, params['ads'] === 'true');
+  this.budgetService.updateOptionSelection(3, params['web'] === 'true');
+  this.budgetService.updatePanelSettings(numPages, numLanguages);
+}
+
+
+updateUrl(mainValue: MainFormValues, panelValue: PanelFormValues): void {
+  const queryParams: Params = {};
+
+
+  if (mainValue.seo) queryParams['seo'] = 'true';
+  if (mainValue.ads) queryParams['ads'] = 'true';
+  if (mainValue.web) queryParams['web'] = 'true';
+
+
+  if (mainValue.web) {
+    if ((panelValue.numPages ?? 0) > 1) queryParams['pages'] = panelValue.numPages;
+    if ((panelValue.numLanguages ?? 0) > 1) queryParams['langs'] = panelValue.numLanguages;
+  }
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+    queryParams: queryParams,
+    queryParamsHandling: 'merge',
+    replaceUrl: true
+  });
+}
+
+
+
+
+//
   saveBudget(): void {
     if (this.clientForm.valid) {
       this.budgetService.saveBudget(
