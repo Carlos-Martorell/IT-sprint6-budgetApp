@@ -7,46 +7,7 @@ import { SortKey } from '@core/models/budget';
   selector: 'app-budgets-list',
   standalone: true,
   imports: [ DatePipe, DecimalPipe, NgClass],
-  template: `
-   <h2 class="text-xl font-bold mb-4">Listado de Presupuestos ({{ budgets().length }})</h2>
-
-@if (budgets().length === 0) {
-  <p class="text-gray-500 text-center p-4 border rounded-lg">Aún no hay presupuestos guardados.</p>
-} @else {
-  <div class="mb-4">
-        <input type="text"
-               (input)="onSearch($event)"
-               placeholder="🔍 Buscar por nombre de cliente..."
-               class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition">
-  </div>
-  <div class="mb-6 flex space-x-5 justify-start">
-    <span class="self-center font-medium text-gray-700">Ordenar por:</span>
-    <button (click)="setSortKey('date')"
-            [ngClass]="getButtonClasses('date')">
-      Fecha
-    </button>
-    <button (click)="setSortKey('price')"
-            [ngClass]="getButtonClasses('price')">
-      Precio
-    </button>
-    <button (click)="setSortKey('name')"
-            [ngClass]="getButtonClasses('name')">
-      Alfabéticamente
-    </button>
-  </div>
-  <div class="space-y-4">
-    @for (budget of filteredAndSortedBudgets(); track budget.id) {
-      <div class="p-4 border rounded-lg shadow-sm bg-white">
-        <div class="font-bold text-lg mb-1">{{ budget.clientName }} - {{ budget.totalPrice | number:'1.2-2' }} €</div>
-        <div class="text-sm text-gray-600">
-          <p>Email: {{ budget.clientEmail }} | Teléfono: {{ budget.clientPhone }}</p>
-          <p>Fecha: {{ budget.creationDate | date:'short' }}</p>
-        </div>
-        </div>
-    }
-  </div>
-}`
-
+  templateUrl: './budgets-list.html'
 })
 export class BudgetsListComponent {
   private budgetService = inject(BudgetService);
