@@ -13,29 +13,23 @@ export class FormUrlSyncService {
   private route = inject(ActivatedRoute);
 
 
-  public readUrlAndApplyToForm(mainForm: FormGroup, panelForm: FormGroup) {
+  public applyParamsToForms(params: Params, mainForm: FormGroup, panelForm: FormGroup): void {
+    const options = { emitEvent: false };
 
-    return this.route.queryParams.pipe(
-        tap(params => {
-            const options = { emitEvent: false };
+    // Lógica de patchValue que ya tenías
+    mainForm.patchValue({
+        seo: params['seo'] === 'true',
+        ads: params['ads'] === 'true',
+        web: params['web'] === 'true',
+    }, options);
 
-            // 🛑 APLICAR LÓGICA DE BOOLEANOS
-            mainForm.patchValue({
-                seo: params['seo'] === 'true',
-                ads: params['ads'] === 'true',
-                web: params['web'] === 'true',
-            }, options);
+    const numPages = parseInt(params['pages'] || '1', 10);
+    const numLanguages = parseInt(params['langs'] || '1', 10);
 
-            // 🛑 APLICAR LÓGICA DE NÚMEROS
-            const numPages = parseInt(params['pages'] || '1', 10);
-            const numLanguages = parseInt(params['langs'] || '1', 10);
-
-            panelForm.patchValue({
-                numPages: numPages,
-                numLanguages: numLanguages,
-            }, options);
-        })
-    );
+    panelForm.patchValue({
+        numPages: numPages,
+        numLanguages: numLanguages,
+    }, options);
 }
 
   public updateUrl(mainValue: MainFormValues, panelValue: PanelFormValues): void {
@@ -53,7 +47,7 @@ export class FormUrlSyncService {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: queryParams,
-      queryParamsHandling: 'merge',
+      queryParamsHandling: '',
       replaceUrl: true
     });
   }

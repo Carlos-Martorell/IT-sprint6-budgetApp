@@ -3,9 +3,10 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { BudgetService } from '@core/services/budget';
 import { CommonModule } from '@angular/common';
 import { BudgetsListComponent } from '@shared/components/budgets-list/budgets-list';
-import { ActivatedRoute, Router, Params } from '@angular/router';
 import { MainFormValues, PanelFormValues } from '@core/models/budget';
 import { FormUrlSyncService } from '@core/services/form-url-sync';
+import { take } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +16,7 @@ import { FormUrlSyncService } from '@core/services/form-url-sync';
   styleUrl: './home.css'
 })
 export class HomeComponent implements OnInit {
+
   public mainForm = new FormGroup({
     seo: new FormControl(false),
     ads: new FormControl(false),
@@ -26,6 +28,7 @@ export class HomeComponent implements OnInit {
   });
 
   private urlSyncService = inject(FormUrlSyncService);
+  private route = inject(ActivatedRoute);
 
 public activeHelpModal = signal<'closed' | 'pages' | 'languages'>('closed');
 
@@ -68,29 +71,41 @@ constructor() {
 }
 
 
-
 ngOnInit(): void {
 
-  this.urlSyncService.readUrlAndApplyToForm(this.mainForm, this.panelForm)
-      .subscribe(params => {
+  this.route.queryParams
+    .pipe(take(1))
+    .subscribe(params => {
 
-          const numPages = parseInt(params['pages'] || '1', 10);
-          const numLanguages = parseInt(params['langs'] || '1', 10);
+      this.urlSyncService.applyParamsToForms(params, this.mainForm, this.panelForm);
 
-          this.budgetService.updateOptionSelection(1, params['seo'] === 'true');
-          this.budgetService.updateOptionSelection(2, params['ads'] === 'true');
-          this.budgetService.updateOptionSelection(3, params['web'] === 'true');
-          this.budgetService.updatePanelSettings(numPages, numLanguages);
+      const numPages = parseInt(params['pages'] || '1', 10);
+      const numLanguages = parseInt(params['langs'] || '1', 10);
+
+      this.budgetService.updateOptionSelection(1, params['seo'] === 'true');
+      this.budgetService.updateOptionSelection(2, params['ads'] === 'true');
+      this.budgetService.updateOptionSelection(3, params['web'] === 'true');
+      this.budgetService.updatePanelSettings(numPages, numLanguages);
+    });
+
+      this.mainForm.valueChanges.subscribe(value => {
+
+        this.budgetService.updateOptionSelection(1, value?.seo ?? false);
+        this.budgetService.updateOptionSelection(2, value?.ads ?? false);
+        this.budgetService.updateOptionSelection(3, value?.web ?? false);
+
+        this.urlSyncService.updateUrl(value as MainFormValues, this.panelForm.value as PanelFormValues);
       });
 
+      this.panelForm.valueChanges.subscribe(values => {
 
-  this.mainForm.valueChanges.subscribe(value => {
-    this.urlSyncService.updateUrl(value, this.panelForm.value);
-  });
+        this.budgetService.updatePanelSettings(
+            (values.numPages ?? 1) as number,
+            (values.numLanguages ?? 1) as number
+        );
 
-  this.panelForm.valueChanges.subscribe(values => {
-    this.urlSyncService.updateUrl(this.mainForm.value, values);
-  });
+        this.urlSyncService.updateUrl(this.mainForm.value as MainFormValues, values as PanelFormValues);
+      });
 }
 
 
