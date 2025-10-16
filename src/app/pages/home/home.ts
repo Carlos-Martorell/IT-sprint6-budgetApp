@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { BudgetsListComponent } from '@shared/components/budgets-list/budgets-list';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { MainFormValues, PanelFormValues } from '@core/models/budget';
+import { FormUrlSyncService } from '@core/services/form-url-sync';
 
 @Component({
   selector: 'app-home',
@@ -24,9 +25,7 @@ export class HomeComponent implements OnInit {
     numLanguages: new FormControl(1, [Validators.required, Validators.min(1)]),
   });
 
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-
+  private urlSyncService = inject(FormUrlSyncService);
 
 public activeHelpModal = signal<'closed' | 'pages' | 'languages'>('closed');
 
@@ -37,103 +36,64 @@ public closeHelpModal(): void {
   this.activeHelpModal.set('closed');
 }
 
-  public budgetService = inject(BudgetService);
+public budgetService = inject(BudgetService);
 
-  public updatePanelValue(controlName: 'numPages' | 'numLanguages', change: 1 | -1): void {
-    const control = this.panelForm.get(controlName); // Obtiene el FormControl específico
+public updatePanelValue(controlName: 'numPages' | 'numLanguages', change: 1 | -1): void {
+  const control = this.panelForm.get(controlName);
 
-    if (control) {
-      let currentValue = control.value as number;
-      let newValue = currentValue + change;
+  if (control) {
+    let currentValue = control.value as number;
+    let newValue = currentValue + change;
 
-      // Validamos que el valor nunca sea menor a 1 (lo mismo que el Validators.min(1))
-      if (newValue < 1) {
-        newValue = 1;
-      }
-
-      // ⬅️ Actualizamos el FormControl, lo que dispara el valueChanges (paso 2)
-      control.setValue(newValue);
+    if (newValue < 1) {
+      newValue = 1;
     }
+
+    control.setValue(newValue);
   }
+}
 
-  fb = inject(FormBuilder);
-  clientForm: FormGroup;
+fb = inject(FormBuilder);
+clientForm: FormGroup;
 
-  constructor() {
+constructor() {
 
-      this.clientForm = this.fb.group({
-        clientName: ['', Validators.required],
-        clientPhone: ['', Validators.required],
-        clientEmail: ['', [Validators.required, Validators.email]]
-      });
-
-
-  }
-  ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.loadFormFromUrl(params);
-    });
-
-    this.mainForm.valueChanges.subscribe(value => {
-      this.updateUrl(value, this.panelForm.value);
-    });
-
-    this.panelForm.valueChanges.subscribe(values => {
-      this.updateUrl(this.mainForm.value, values);
-    });
-  }
-
-loadFormFromUrl(params: Params): void {
-  const options = { emitEvent: false };
-
-  this.mainForm.patchValue({
-    seo: params['seo'] === 'true',
-    ads: params['ads'] === 'true',
-    web: params['web'] === 'true',
-  }, options);
-
-  const numPages = parseInt(params['pages'] || '1', 10);
-  const numLanguages = parseInt(params['langs'] || '1', 10);
-
-  this.panelForm.patchValue({
-    numPages: numPages,
-    numLanguages: numLanguages,
-  }, options);
+  this.clientForm = this.fb.group({
+    clientName: ['', Validators.required],
+    clientPhone: ['', Validators.required],
+    clientEmail: ['', [Validators.required, Validators.email]]
+  });
 
 
-  this.budgetService.updateOptionSelection(1, params['seo'] === 'true');
-  this.budgetService.updateOptionSelection(2, params['ads'] === 'true');
-  this.budgetService.updateOptionSelection(3, params['web'] === 'true');
-  this.budgetService.updatePanelSettings(numPages, numLanguages);
 }
 
 
-updateUrl(mainValue: MainFormValues, panelValue: PanelFormValues): void {
-  const queryParams: Params = {};
+
+ngOnInit(): void {
+
+  this.urlSyncService.readUrlAndApplyToForm(this.mainForm, this.panelForm)
+      .subscribe(params => {
+
+          const numPages = parseInt(params['pages'] || '1', 10);
+          const numLanguages = parseInt(params['langs'] || '1', 10);
+
+          this.budgetService.updateOptionSelection(1, params['seo'] === 'true');
+          this.budgetService.updateOptionSelection(2, params['ads'] === 'true');
+          this.budgetService.updateOptionSelection(3, params['web'] === 'true');
+          this.budgetService.updatePanelSettings(numPages, numLanguages);
+      });
 
 
-  if (mainValue.seo) queryParams['seo'] = 'true';
-  if (mainValue.ads) queryParams['ads'] = 'true';
-  if (mainValue.web) queryParams['web'] = 'true';
+  this.mainForm.valueChanges.subscribe(value => {
+    this.urlSyncService.updateUrl(value, this.panelForm.value);
+  });
 
-
-  if (mainValue.web) {
-    if ((panelValue.numPages ?? 0) > 1) queryParams['pages'] = panelValue.numPages;
-    if ((panelValue.numLanguages ?? 0) > 1) queryParams['langs'] = panelValue.numLanguages;
-  }
-
-  this.router.navigate([], {
-    relativeTo: this.route,
-    queryParams: queryParams,
-    queryParamsHandling: 'merge',
-    replaceUrl: true
+  this.panelForm.valueChanges.subscribe(values => {
+    this.urlSyncService.updateUrl(this.mainForm.value, values);
   });
 }
 
 
-
-
-//
   saveBudget(): void {
     if (this.clientForm.valid) {
       this.budgetService.saveBudget(

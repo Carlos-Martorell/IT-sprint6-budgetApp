@@ -47,10 +47,10 @@ private budgets = signal<Budget[]>([]);
 getBudgets() {
   return this.budgets.asReadonly();
 }
+
 // Contador para asignar IDs
 private nextBudgetId = 1;
 saveBudget(clientName: string, clientPhone: string, clientEmail: string): void {
-
  //Clonar el estado actual del presupuesto
   const newBudget: Budget = {
     id: this.nextBudgetId++, // Asignar ID
