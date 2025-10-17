@@ -1,59 +1,89 @@
-# PresupuestosApp
+# 🚀 Budget Planning App (Angular 20 Standalone)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
+This application is a real-time tool for calculating web development budget estimates. It allows for the selection of services, immediate price calculation, and URL query parameter synchronization to easily share project configurations.
 
-## Development server
+---
 
-To start a local development server, run:
+## Background & Philosophy
 
-```bash
-ng serve
-```
+This project showcases a modern approach to building scalable Angular applications by leveraging the latest features of **Angular 20**.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+The core philosophy focuses on:
 
-## Code scaffolding
+* **Modern Angular:** Full adoption of **Standalone Components** and **Angular Signals** for simplified architecture and reactive state management.
+* **Separation of Concerns:** Business logic is confined to services (`BudgetService`), while components focus purely on integration and presentation.
+* **URL-Driven State:** The application state is synchronized with the URL, allowing configurations to be easily shared and persisted.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+---
 
-```bash
-ng generate component component-name
-```
+## Features
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+* ✅ Dynamic pricing based on service and configuration selection.
+* ✅ Real-time cost calculation (total price signal).
+* ✅ **Form-to-URL Synchronization** (bi-directional).
+* ✅ Budget creation and client management.
+* ✅ Budget search and sort functionality in the list view.
+* ✅ **Full TypeScript** support for type safety.
+* ✅ Responsive UI design with **Tailwind CSS**.
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+## Tech Stack
 
-To build the project run:
+The project utilizes the following modern Angular 20 and related technologies:
 
-```bash
-ng build
-```
+* **Framework:** **Angular 20+**
+* **Architecture:** Standalone Components, Angular Signals
+* **Styling:** Tailwind CSS
+* **Forms:** Angular Reactive Forms
+* **Routing:** Angular Router, ActivatedRoute
+* **Testing:** **Jasmine** and **Karma** (configured via `angular.json`)
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## Getting Started
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Ensure you have [Node.js](https://nodejs.org/en/download/) and npm installed.
 
-```bash
-ng test
-```
+1.  **Clone the repository:**
+    ```bash
+    git clone [YOUR-REPOSITORY-URL]
+    cd presupuestos-app
+    ```
 
-## Running end-to-end tests
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    # Use --legacy-peer-deps only if version conflicts occur:
+    # npm install --legacy-peer-deps
+    ```
 
-For end-to-end (e2e) testing, run:
+3.  **Run the application:**
+    ```bash
+    ng serve
+    ```
+    The app will be served at `http://localhost:4200/`.
 
-```bash
-ng e2e
-```
+---
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Testing Strategy
 
-## Additional Resources
+The project features a **comprehensive unit testing strategy** focused on isolating and validating core business logic.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Test Coverage
+
+Tests are categorized based on their role in the application:
+
+* **Business Logic (`BudgetService`)**: Ensures correct price calculation and persistent data handling.
+* **Infrastructure (`FormUrlSyncService`)**: Validates the bi-directional mapping between form data and URL query parameters.
+* **Form Integration (`HomeComponent`)**: Tests the flow between form changes, service updates, and URL synchronization.
+* **UI Logic (`BudgetsListComponent`)**: Covers all internal component logic, including filtering, sorting, and state management using Signals.
+
+### Execution Commands
+
+| Command | Description |
+| :--- | :--- |
+| `npm test` | Runs all tests in **watch mode** (re-runs on file changes). |
+| `ng test --watch=false --browsers=ChromeHeadless` | Runs tests **once** in a headless browser (ideal for Continuous Integration/CI). |
+| `ng test --code-coverage` | Runs tests and generates a detailed **coverage report** in the `coverage/` folder. |
+
