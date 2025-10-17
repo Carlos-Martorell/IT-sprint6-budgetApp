@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { BudgetService } from '@core/services/budget';
 import { CommonModule } from '@angular/common';
 import { BudgetsListComponent } from '@shared/components/budgets-list/budgets-list';
-import { MainFormValues, PanelFormValues } from '@core/models/budget';
+import { MainFormValues, PanelFormValues } from '@core/models/budget-models';
 import { FormUrlSyncService } from '@core/services/form-url-sync';
 import { take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';

@@ -1,7 +1,12 @@
 
 import { BudgetService } from './budget';
 
-describe('BudgetService (Lógica de Precios y Signals)', () => {
+const SEO_PRICE = 300;
+const ADS_PRICE = 400;
+const WEB_PRICE = 500;
+const MODULE_PRICE = 30;
+
+describe('BudgetService (Pruebas Unitarias - Instanciación Directa)', () => {
   let service: BudgetService;
 
   beforeEach(() => {
@@ -11,6 +16,7 @@ describe('BudgetService (Lógica de Precios y Signals)', () => {
     service.updateOptionSelection(2, false);
     service.updateOptionSelection(3, false);
     service.updatePanelSettings(1, 1);
+
   });
 
 
@@ -19,57 +25,61 @@ describe('BudgetService (Lógica de Precios y Signals)', () => {
     expect(service.totalPrice()).toBe(0);
   });
 
-
   it('should calculate base cost correctly when SEO (300) and ADS (400) are selected', () => {
     service.updateOptionSelection(1, true);
     service.updateOptionSelection(2, true);
-    expect(service.totalPrice()).toBe(700);
+    expect(service.totalPrice()).toBe(SEO_PRICE + ADS_PRICE);
   });
 
-  it('should calculate base cost correctly when only WEB (500) is selected', () => {
-    service.updateOptionSelection(3, true);
-    expect(service.totalPrice()).toBe(500);
-  });
-
-  it('should calculate extra cost for pages if Web is selected (4 Pages, 1 Lang)', () => {
+  it('should calculate extra cost for 4 Pages (3 extra) if Web is selected', () => {
     service.updateOptionSelection(3, true);
     service.updatePanelSettings(4, 1);
-
-    expect(service.totalPrice()).toBe(590);
+    // Coste: 500 + (4-1)*30 = 590
+    expect(service.totalPrice()).toBe(WEB_PRICE + 3 * MODULE_PRICE);
   });
 
-  it('should calculate extra cost for languages if Web is selected (1 Page, 3 Langs)', () => {
+  it('should calculate extra cost for 3 Languages (2 extra) if Web is selected', () => {
     service.updateOptionSelection(3, true);
     service.updatePanelSettings(1, 3);
-
-    expect(service.totalPrice()).toBe(560);
+    // Coste: 500 + (3-1)*30 = 560
+    expect(service.totalPrice()).toBe(WEB_PRICE + 2 * MODULE_PRICE);
   });
 
-  it('should calculate extra cost for both pages and languages (2 Pages, 2 Langs)', () => {
-    service.updateOptionSelection(3, true);
-    service.updatePanelSettings(2, 2);
-
-    expect(service.totalPrice()).toBe(560);
+  it('should calculate total price including base and extra costs (Full Scenario)', () => {
+    service.updateOptionSelection(1, true); // SEO (300)
+    service.updateOptionSelection(3, true); // WEB (500)
+    service.updatePanelSettings(3, 2); // (3-1)*30 + (2-1)*30 = 90
+    // Total: 300 + 500 + 90 = 890
+    expect(service.totalPrice()).toBe(SEO_PRICE + WEB_PRICE + 3 * MODULE_PRICE);
   });
 
-  it('should handle zero extra cost when 1 Page and 1 Lang are selected', () => {
-    service.updateOptionSelection(3, true);
-    service.updatePanelSettings(1, 1);
-    expect(service.totalPrice()).toBe(500);
+  it('should NOT add extra cost if Web is not selected', () => {
+    service.updatePanelSettings(5, 5); // 8 extras
+    service.updateOptionSelection(1, true); // Solo SEO (300)
+    expect(service.totalPrice()).toBe(SEO_PRICE);
   });
 
-  it('should NOT add extra cost if Web is not selected, even with panel values > 1', () => {
-    service.updatePanelSettings(5, 5);
-    service.updateOptionSelection(3, false);
+// --- PRUEBAS DE FLUJO DE GUARDADO Y RESETEO ---
 
-    expect(service.totalPrice()).toBe(0);
-  });
-
-  it('should calculate total price including base and extra costs', () => {
+  it('should save a budget with the correct data and reset state', () => {
+    // 1. Configurar estado y calcular precio (el precio total es 890)
     service.updateOptionSelection(1, true);
     service.updateOptionSelection(3, true);
     service.updatePanelSettings(3, 2);
+    const expectedPrice = service.totalPrice();
 
-    expect(service.totalPrice()).toBe(890);
+    // 2. Guardar
+    service.saveBudget('Test Client', '123456789', 'test@example.com');
+
+    // 3. Verificar GUARDADO
+    const savedBudgets = service.getBudgets();
+    expect(savedBudgets().length).toBe(1);
+    expect(savedBudgets()[0].clientName).toBe('Test Client');
+    expect(savedBudgets()[0].totalPrice).toBe(expectedPrice);
+    expect(savedBudgets()[0].id).toBe(1);
+
+    // 4. Verificar RESESTEO
+    expect(service.totalPrice()).toBe(0);
+    expect(service.numPages()).toBe(1);
   });
 });

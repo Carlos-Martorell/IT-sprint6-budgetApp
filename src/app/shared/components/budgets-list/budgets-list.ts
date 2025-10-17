@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {  DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import { BudgetService } from '@core/services/budget';
-import { SortKey } from '@core/models/budget';
+import { SortKey } from '@core/models/budget-models';
 
 @Component({
   selector: 'app-budgets-list',

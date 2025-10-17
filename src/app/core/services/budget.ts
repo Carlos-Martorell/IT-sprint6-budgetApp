@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { ServiceOption, Budget } from '../models/budget';
+import { ServiceOption, Budget } from '../models/budget-models';
 
 @Injectable({
   providedIn: 'root'
